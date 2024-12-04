@@ -1,0 +1,1 @@
+cmd_/home/km/MIRAFRA/TRAINING/DEVICE_DRIVERS/basic_code.ko := ld -r -m elf_x86_64  -z max-page-size=0x200000 -z noexecstack   --build-id  -T ./scripts/module-common.lds -o /home/km/MIRAFRA/TRAINING/DEVICE_DRIVERS/basic_code.ko /home/km/MIRAFRA/TRAINING/DEVICE_DRIVERS/basic_code.o /home/km/MIRAFRA/TRAINING/DEVICE_DRIVERS/basic_code.mod.o;  true

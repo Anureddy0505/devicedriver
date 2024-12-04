@@ -1,0 +1,2 @@
+/home/km/MIRAFRA/TRAINING/DEVICE_DRIVERS/basic_code.o
+
