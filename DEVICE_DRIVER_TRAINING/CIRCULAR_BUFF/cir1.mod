@@ -1,0 +1,2 @@
+/home/km/MIRAFRA/TRAINING/CIRCULAR_BUFF/cir1.o
+
