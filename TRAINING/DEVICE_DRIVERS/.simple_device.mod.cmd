@@ -1,1 +1,0 @@
-cmd_/home/km/MIRAFRA/TRAINING/DEVICE_DRIVERS/simple_device.mod := { echo  /home/km/MIRAFRA/TRAINING/DEVICE_DRIVERS/simple_device.o;  echo; } > /home/km/MIRAFRA/TRAINING/DEVICE_DRIVERS/simple_device.mod

@@ -1,0 +1,6 @@
+Key Difference
+Feature	   Sysfs Driver                         	Normal Driver
+Interface	Exposed through /sys	         Exposed through /dev
+Access Type	Attribute files (e.g., config)   System calls like read/write
+Purpose		Configuration and introspection	     Direct hardware interaction
+Use Case	Managing settings, statuses   	 Transferring data, controlling devices

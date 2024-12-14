@@ -1,0 +1,1 @@
+cmd_/home/km/MIRAFRA/TRAINING/KEYBOARD_INTERRUPT/key.mod := { echo  /home/km/MIRAFRA/TRAINING/KEYBOARD_INTERRUPT/key.o;  echo; } > /home/km/MIRAFRA/TRAINING/KEYBOARD_INTERRUPT/key.mod

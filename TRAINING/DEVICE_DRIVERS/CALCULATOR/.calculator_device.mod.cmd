@@ -1,1 +1,0 @@
-cmd_/home/km/MIRAFRA/TRAINING/DEVICE_DRIVERS/CALCULATOR/calculator_device.mod := { echo  /home/km/MIRAFRA/TRAINING/DEVICE_DRIVERS/CALCULATOR/calculator_device.o;  echo; } > /home/km/MIRAFRA/TRAINING/DEVICE_DRIVERS/CALCULATOR/calculator_device.mod

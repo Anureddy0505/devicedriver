@@ -1,1 +1,0 @@
-cmd_/home/km/MIRAFRA/TRAINING/DEVICE_DRIVERS/DOUBLE_DRIVER_CODE/double_driver.mod := { echo  /home/km/MIRAFRA/TRAINING/DEVICE_DRIVERS/DOUBLE_DRIVER_CODE/double_driver.o;  echo; } > /home/km/MIRAFRA/TRAINING/DEVICE_DRIVERS/DOUBLE_DRIVER_CODE/double_driver.mod

@@ -1,0 +1,15 @@
+/dts-v1/;//version 
+/plugin/;//hot plugin
+
+/{
+    compatible = "brcm,bcm2835";//device board name
+
+    fragment@0 {
+        target = <&gpio>;//giving as gpio 
+        _overlay_ {//overlay consists of all dts files
+            gpio_led: gpio_led {
+                gpios = <&gpio 27 0>; // GPIO 17 is used for the LED
+            };
+        };
+    };
+};

@@ -3,7 +3,7 @@
 #include <linux/fs.h>     // File operations
 #include <linux/uaccess.h> // For copy_to_user and copy_from_user
 
-#define DEVICE_NAME "keyvalue"
+#define DEVICE_NAME "keyvalcir"
 #define MAX_SIZE 3
 #define MAX_LEN 50
 
@@ -13,12 +13,12 @@ struct kv_pair {
     char value[MAX_LEN];
 };
 
-static int major_number; // Major number for device
-static int open_count = 0; // Track how many times the device is opened
+static int major_number; 
+static int open_count = 0; 
 static struct kv_pair kv[MAX_SIZE]; // Array of key-value pairs
-static int wcount = 0;
-static int rcount = 0;
-static int k=0;
+static int head = 0; // Head  circular buffer
+static int tail = 0; // Tail  circular buffer
+static int count = 0; 
 static char buff[100];
 static char buff1[100];
 
@@ -53,68 +53,78 @@ static int device_close(struct inode *inode, struct file *file) {
 static ssize_t device_read(struct file *file, char __user *user_buffer, size_t size, loff_t *offset) {
     char output[100];
 
-    if (rcount == MAX_SIZE) {
-        if (copy_to_user(user_buffer, buff, strlen(buff) + 1)) {
-            return -EFAULT;
-
-        }
-		rcount++;
-    } else if(rcount<=MAX_SIZE){
-        snprintf(output, sizeof(output), "ID:%d,KEY:%d,VALUE:%s", kv[rcount].index, kv[rcount].key, kv[rcount].value);
-        if (copy_to_user(user_buffer, output, strlen(output) + 1)) {
+    if (count == 0) {
+        snprintf(buff1, sizeof(buff1), "Buffer empty\n");
+        if (copy_to_user(user_buffer, buff1, strlen(buff1) + 1)) {
             return -EFAULT;
         }
-        rcount++;
+        return 0;
     }
-	else if(rcount>MAX_SIZE){
-	if (copy_to_user(user_buffer, buff1, strlen(buff1) + 1)) {
-            return -EFAULT;
-        }
-	}
-    return size;
+
+    snprintf(output, sizeof(output), "ID:%d,KEY:%d,VALUE:%s", kv[tail].index, kv[tail].key, kv[tail].value);
+    if (copy_to_user(user_buffer, output, strlen(output) + 1)) {
+        return -EFAULT;
+    }
+
+    tail = (tail + 1) % MAX_SIZE;
+    count--;
+
+    return strlen(output);
 }
 
 // Device write function
 static ssize_t device_write(struct file *file, const char __user *user_buffer, size_t size, loff_t *offset) {
     int index;
+    int i;
 
-  /*  if (size != sizeof(struct kv_pair)) {
-       y printk(KERN_ERR "Invalid data size: expected %lu, got %zu\n", sizeof(struct kv_pair), size);
-        return -EINVAL;
-    }*/
-    if (wcount < MAX_SIZE)
-   	{
-        if (copy_from_user(&kv[wcount], user_buffer, sizeof(struct kv_pair))) {
+    // Check if buffer is full
+    if (count < MAX_SIZE) {
+        // Copy the user data to the circular buffer
+        if (copy_from_user(&kv[head], user_buffer, sizeof(struct kv_pair))) {
             return -EFAULT;
         }
-        wcount++;
-    } 
-	else if(wcount==MAX_SIZE)
-	{
-        snprintf(buff, sizeof(buff), "Write limit exceeded");
-		wcount++;
-		printk(KERN_INFO "buff\n",buff);
+        head = (head + 1) % MAX_SIZE;
+        count++;
+    } else {
+        // Buffer is full, overwrite old data and return a message to indicate the limit is exceeded
+        snprintf(buff, sizeof(buff), "Write limit exceeded\n");
+        if (copy_to_user(user_buffer, buff, strlen(buff) + 1)) {
+            return -EFAULT;
+        }
+        
+        // Overwrite the oldest entry
+        if (copy_from_user(&kv[head], user_buffer, sizeof(struct kv_pair))) {
+            return -EFAULT;
+        }
+        head = (head + 1) % MAX_SIZE;
+        tail = (tail + 1) % MAX_SIZE; // Move tail forward to overwrite the oldest data
+        count = MAX_SIZE;  // Ensure count remains at MAX_SIZE
     }
-	else
-	{
-    	(copy_from_user(&index, user_buffer, sizeof(int))); 
-		printk(KERN_INFO "%d",index);
-        for(k=0; k<MAX_SIZE; k++) 
-		{
-    	   	 if (kv[k].index == index)
-		   	{
-                snprintf(buff1, sizeof(buff1), "Received index=%d, key=%d, value=%s\n", kv[k].index, kv[k].key, kv[k].value);
-				pr_info("%s",buff1);
+
+    // Handle reading by index if size is sizeof(int)
+    if (size == sizeof(int)) {
+        if (copy_from_user(&index, user_buffer, sizeof(int))) {
+            return -EFAULT;
+        }
+
+        for (i = 0; i < MAX_SIZE; i++) {
+            int pos = (tail + i) % MAX_SIZE;
+            if (kv[pos].index == index) {
+                snprintf(buff1, sizeof(buff1), "Received index=%d, key=%d, value=%s\n", kv[pos].index, kv[pos].key, kv[pos].value);
+                pr_info("%s", buff1);
                 return size;
-        	}
-    	}
+            }
+        }
+
         snprintf(buff1, sizeof(buff1), "Index not found\n");
-		pr_info("%s",buff1);
-    
-	}
+        pr_info("%s", buff1);
+    }
 
     return size;
 }
+
+// Device write function
+
 
 // Module initialization function
 static int __init simple_driver_init(void) {
@@ -138,5 +148,4 @@ module_exit(simple_driver_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Your Name");
-MODULE_DESCRIPTION("A Simple Linux Device Driver");
-
+MODULE_DESCRIPTION("A Simple Linux Device Driver with Circular Buffer");
